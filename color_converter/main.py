@@ -71,25 +71,28 @@ class ColorConverterApp(QMainWindow):
         self.color_map.set_rgb_color(r, g, b)
         self._sync_in_progress = False
 
-    def _update_from_rgb(self, r, g, b):
+    def _update_from_rgb(self, r, g, b, source=None):
         self._sync_in_progress = True
-        self.rgb_row.set_rgb(r, g, b)
-        self.cmyk_row.set_cmyk(*self.converter.rgb_to_cmyk(r, g, b))
-        self.hsv_row.set_hsv(*self.converter.rgb_to_hsv(r, g, b))
+        if source != "rgb":
+            self.rgb_row.set_rgb(r, g, b)
+        if source != "cmyk":
+            self.cmyk_row.set_cmyk(*self.converter.rgb_to_cmyk(r, g, b))
+        if source != "hsv":
+            self.hsv_row.set_hsv(*self.converter.rgb_to_hsv(r, g, b))
         self.color_map.set_rgb_color(r, g, b)
         self._sync_in_progress = False
 
     def on_rgb_changed(self, r, g, b):
         if self._sync_in_progress: return
-        self._update_from_rgb(r, g, b)
+        self._update_from_rgb(r, g, b, source="rgb")
 
     def on_cmyk_changed(self, c, m, y, k):
         if self._sync_in_progress: return
-        self._update_from_rgb(*self.converter.cmyk_to_rgb(c, m, y, k))
+        self._update_from_rgb(*self.converter.cmyk_to_rgb(c, m, y, k), source="cmyk")
 
     def on_hsv_changed(self, h, s, v):
         if self._sync_in_progress: return
-        self._update_from_rgb(*self.converter.hsv_to_rgb(h, s, v))
+        self._update_from_rgb(*self.converter.hsv_to_rgb(h, s, v), source="hsv")
 
     def on_color_map_changed(self, r, g, b):
         if self._sync_in_progress: return
